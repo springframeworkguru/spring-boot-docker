@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SfgThymeleafCourseApplication {
+public class SfgDockerCourseApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SfgThymeleafCourseApplication.class, args);
+		SpringApplication.run(SfgDockerCourseApplication.class, args);
 	}
 }

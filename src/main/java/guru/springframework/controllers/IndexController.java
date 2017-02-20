@@ -15,7 +15,7 @@ public class IndexController {
     private ProductService productService;
 
     @Autowired
-    public void setProductService(ProductService productService) {
+    public IndexController(ProductService productService) {
         this.productService = productService;
     }
 
@@ -27,8 +27,4 @@ public class IndexController {
         return "index";
     }
 
-    @RequestMapping("secured")
-    public String secured(){
-        return "secured";
-    }
 }
