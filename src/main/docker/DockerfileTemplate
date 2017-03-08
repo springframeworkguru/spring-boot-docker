@@ -2,5 +2,5 @@ FROM openjdk
 
 VOLUME /tmp
 ADD maven/${fileName}.jar ${fileName}.jar
-RUN sh -c 'touch /myapp.jar'
+RUN sh -c 'touch /${fileName}'
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/${fileName}.jar"]
