@@ -21,3 +21,9 @@ springframeworkguru/pageviewservice
 
 # Example MVN Command for CI
 mvn clean package verify docker:push
+
+#start docker compose in background
+docker-compose up -d
+
+#stop docker-compose
+docker-compose down
