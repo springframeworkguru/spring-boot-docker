@@ -37,3 +37,20 @@ docker service create \
 --mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
 portainer/portainer \
 -H unix:///var/run/docker.sock
+
+## ssh to node on DigitalOcean
+ssh -i "~/.ssh/<your key here>"  root@<your node ip here>
+
+#Init Docker Swarm
+docker swarm init
+
+## Create portainer service in docker swarm on port 80
+docker service create \
+--name portainer \
+--publish 80:9000 \
+--constraint 'node.role == manager' \
+--mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
+portainer/portainer \
+-H unix:///var/run/docker.sock
+
+docker swarm init --force-new-cluster --advertise-addr node3:2377
