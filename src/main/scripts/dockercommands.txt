@@ -53,4 +53,5 @@ docker service create \
 portainer/portainer \
 -H unix:///var/run/docker.sock
 
+## force new quarum
 docker swarm init --force-new-cluster --advertise-addr node3:2377
