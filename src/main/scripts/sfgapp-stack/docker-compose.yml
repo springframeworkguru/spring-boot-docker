@@ -1,4 +1,4 @@
-version: '3'
+version: '3.1'
 
 services:
   mysqldb:
@@ -9,10 +9,13 @@ services:
     environment:
       MYSQL_DATABASE: pageviewservice
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_ROOT_PASSWORD_FILE: '/run/secrets/mysql.txt'
     networks:
       - database_net
     deploy:
       replicas: 1
+    secrets:
+      - mysql.txt
 
   rabbitmq:
     image: rabbitmq
@@ -39,6 +42,7 @@ services:
       SPRING_DATASOURCE_URL: 'jdbc:mysql://mysqldb:3306/pageviewservice'
       SPRING_PROFILES_ACTIVE: 'mysql'
       SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_CONFIG_LOCATION: 'file:run/secrets/'
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
       interval: 30s
@@ -49,6 +53,8 @@ services:
       - database_net
     deploy:
       replicas: 3
+    secrets:
+      - application.properties
 
   springbootdocker:
     image: springframeworkguru/springbootdocker
@@ -74,3 +80,8 @@ networks:
     driver: overlay
   database_net:
     driver: overlay
+secrets:
+  mysql.txt:
+    external: true
+  application.properties:
+    file: ./application.properties
