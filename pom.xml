@@ -5,7 +5,7 @@
 
 	<groupId>guru.springframework</groupId>
 	<artifactId>spring-boot-docker</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>spring-boot-docker</name>
@@ -21,9 +21,21 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
+
+		<!--set this to your docker acct name-->
+		<docker.image.prefix>springframeworkguru</docker.image.prefix>
+
+		<!--Set to name of project-->
+		<docker.image.name>springbootdocker</docker.image.name>
+
 	</properties>
 
 	<dependencies>
+        <dependency>
+            <groupId>guru.springframework</groupId>
+            <artifactId>page-view-client</artifactId>
+            <version>0.0.2</version>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -32,7 +44,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -52,6 +63,68 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.20.0</version>
+
+				<configuration>
+
+                    <!--<dockerHost>http://127.0.0.1:2375</dockerHost>-->
+                    <dockerHost>unix:///var/run/docker.sock</dockerHost>
+
+                    <verbose>true</verbose>
+					<images>
+						<image>
+							<name>${docker.image.prefix}/${docker.image.name}</name>
+							<build>
+								<dockerFileDir>${project.basedir}/target/dockerfile/</dockerFileDir>
+
+                                <!--copies artficact to docker build dir in target-->
+								<assembly>
+									<descriptorRef>artifact</descriptorRef>
+								</assembly>
+								<tags>
+									<tag>latest</tag>
+									<tag>${project.version}</tag>
+								</tags>
+							</build>
+                            <run>
+                                <ports>
+                                    <port>8080:8080</port>
+                                </ports>
+                            </run>
+						</image>
+					</images>
+				</configuration>
+			</plugin>
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <scripts>
+                        <script>file:///${project.basedir}/src/main/scripts/BuildDockerfile.groovy</script>
+                    </scripts>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-all</artifactId>
+                        <!-- any version of Groovy \>= 1.5.0 should work here -->
+                        <version>2.4.8</version>
+                        <scope>runtime</scope>
+                    </dependency>
+                </dependencies>
+            </plugin>
 		</plugins>
 	</build>
 	
