@@ -1,0 +1,2 @@
+1. mvn clean package
+2. mvn clean package docker:build 	// to build a docker image.

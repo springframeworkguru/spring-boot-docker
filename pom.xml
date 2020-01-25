@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -15,17 +16,17 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>1.5.1.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 
-		<!--set this to your docker acct name-->
-		<docker.image.prefix>springframeworkguru</docker.image.prefix>
+		<!--set this to your docker acct name -->
+		<docker.image.prefix>springframeworkdaniel</docker.image.prefix>
 
-		<!--Set to name of project-->
+		<!--Set to name of project -->
 		<docker.image.name>springbootdocker</docker.image.name>
 
 	</properties>
@@ -45,14 +46,14 @@
 			<artifactId>spring-boot-devtools</artifactId>
 		</dependency>
 
-		<!--testing deps-->
+		<!--testing deps -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -62,21 +63,23 @@
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.20.0</version>
+				<version>0.32.0</version>
 
 				<configuration>
+					<!-- docker running on linux/localhost -->
+					<dockerHost>http://127.0.0.1:2375</dockerHost>
 
-                    <!--<dockerHost>http://127.0.0.1:2375</dockerHost>-->
-                    <dockerHost>unix:///var/run/docker.sock</dockerHost>
+					<!-- to connect to docker daemon running on the osx. -->
+					<!--<dockerHost>unix:///var/run/docker.sock</dockerHost> -->
 
-                    <verbose>true</verbose>
+					<verbose>true</verbose>
 					<images>
 						<image>
 							<name>${docker.image.prefix}/${docker.image.name}</name>
 							<build>
 								<dockerFileDir>${project.basedir}/src/main/docker/</dockerFileDir>
 
-                                <!--copies artficact to docker build dir in target-->
+								<!--copies artficact to docker build dir in target -->
 								<assembly>
 									<descriptorRef>artifact</descriptorRef>
 								</assembly>
@@ -91,6 +94,6 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 
 </project>
