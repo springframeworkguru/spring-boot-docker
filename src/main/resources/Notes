@@ -1,2 +1,15 @@
 1. mvn clean package
 2. mvn clean package docker:build 	// to build a docker image.
+
+Pre-requisite ->
+	1. in maven (settings.xml) add the following entry under the <servers> tag
+				<servers>
+					<server>
+					      <id>docker.io</id>
+					      <username>some_user</username>
+					      <password>some_user_password</password>
+					    </server>
+				</servers>
+	2. in the project pom.xml make sure make sure the following tag has the image prefix of your account name i.e.
+				<docker.image.prefix>some_user</docker.image.prefix>
+		

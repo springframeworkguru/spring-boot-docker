@@ -24,10 +24,10 @@
 		<java.version>1.8</java.version>
 
 		<!--set this to your docker acct name -->
-		<docker.image.prefix>springframeworkdaniel</docker.image.prefix>
-
+		<docker.image.prefix>danielatlas31</docker.image.prefix>
+		
 		<!--Set to name of project -->
-		<docker.image.name>springbootdocker</docker.image.name>
+		<docker.image.name>springbootdockerdaniel</docker.image.name>
 
 	</properties>
 
@@ -64,25 +64,26 @@
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
 				<version>0.32.0</version>
-
+				
 				<configuration>
 					<!-- docker running on linux/localhost -->
 					<dockerHost>http://127.0.0.1:2375</dockerHost>
-
+					
 					<!-- to connect to docker daemon running on the osx. -->
 					<!--<dockerHost>unix:///var/run/docker.sock</dockerHost> -->
-
+					
 					<verbose>true</verbose>
 					<images>
 						<image>
 							<name>${docker.image.prefix}/${docker.image.name}</name>
 							<build>
 								<dockerFileDir>${project.basedir}/src/main/docker/</dockerFileDir>
-
+								
 								<!--copies artficact to docker build dir in target -->
 								<assembly>
 									<descriptorRef>artifact</descriptorRef>
 								</assembly>
+								
 								<tags>
 									<tag>latest</tag>
 									<tag>${project.version}</tag>
