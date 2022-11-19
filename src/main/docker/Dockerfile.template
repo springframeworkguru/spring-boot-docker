@@ -1,6 +1,6 @@
-FROM openjdk:8-jdk-slim-bullseye
+FROM openjdk:8-jdk
 
 VOLUME /tmp
-COPY maven/${fileName}.jar app.jar
-RUN sh -c 'touch /app.jar'
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+COPY maven/${fileName}.jar ${fileName}.jar
+RUN sh -c 'touch /${fileName}.jar'
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/${fileName}.jar"]
