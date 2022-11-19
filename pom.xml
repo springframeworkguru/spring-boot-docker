@@ -21,6 +21,11 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
+		<!--set this to your docker acct name-->
+		<docker.image.prefix>d4jd</docker.image.prefix>
+
+		<!--Set to name of project-->
+		<docker.image.name>springbootdocker</docker.image.name>
 	</properties>
 
 	<dependencies>
@@ -48,10 +53,44 @@
 	
 	<build>
 		<plugins>
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+
+
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.20.0</version>
+
+				<configuration>
+
+					<dockerHost>http://127.0.0.1:2375</dockerHost>
+					<!--<dockerHost>unix:///var/run/docker.sock</dockerHost>-->
+
+					<verbose>true</verbose>
+					<images>
+						<image>
+							<name>${docker.image.prefix}-${docker.image.name}</name>
+							<build>
+								<dockerFileDir>${project.basedir}/src/main/docker/</dockerFileDir>
+
+								<!--copies artifact to docker build dir in target-->
+								<assembly>
+									<descriptorRef>artifact</descriptorRef>
+								</assembly>
+								<tags>
+									<tag>latest</tag>
+									<tag>${project.version}</tag>
+								</tags>
+							</build>
+						</image>
+					</images>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 	
