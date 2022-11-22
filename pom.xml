@@ -5,7 +5,7 @@
 
 	<groupId>guru.springframework</groupId>
 	<artifactId>spring-boot-docker</artifactId>
-	<version>0.0.7-SNAPSHOT</version>
+	<version>0.0.8-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>spring-boot-docker</name>
@@ -75,6 +75,7 @@
 
 					<verbose>true</verbose>
 					<images>
+
 						<image>
 							<name>${docker.image.prefix}-${docker.image.name}</name>
 							<build>
@@ -92,8 +93,100 @@
 								<ports>
 									<port>8080:8080</port>
 								</ports>
+								<links>
+									<link>rabbitmqsrv:rabbitmqsrv</link>
+								</links>
+								<env>
+									<SPRING_RABBITMQ_HOST>rabbitmqsrv</SPRING_RABBITMQ_HOST>
+								</env>
+								<dependsOn>
+									<container>rabbitmqsrv</container>
+									<container>pageviewservice</container>
+								</dependsOn>
 							</run>
 						</image>
+
+						<!--mysql container-->
+						<image>
+							<alias>mysqldb</alias>
+							<name>mysql:5.7</name>
+							<run>
+								<ports>
+									<port>3306:3306</port>
+								</ports>
+								<volumes>
+									<bind>
+										<volume>/c/tmp/docker/mysql/pageviewservice:/var/lib/mysql</volume>
+									</bind>
+								</volumes>
+								<!--set env prams for mysql image-->
+								<env>
+									<MYSQL_DATABASE>pageviewservice</MYSQL_DATABASE>
+									<MYSQL_ALLOW_EMPTY_PASSWORD>yes</MYSQL_ALLOW_EMPTY_PASSWORD>
+								</env>
+								<!--wait for db to start-->
+								<wait>
+									<time>3000</time>
+								</wait>
+							</run>
+						</image>
+
+						<!--rabbit container-->
+						<image>
+							<alias>rabbitmqsrv</alias>
+							<name>rabbitmq:management</name>
+							<run>
+								<hostname>rabbitmqsrv</hostname>
+								<ports>
+									<port>5672</port>
+									<port>15672</port>
+								</ports>
+								<volumes>
+									<bind>
+										<volume>/c/tmp/docker/rabbitmq:/var/lib/rabbitmq</volume>
+									</bind>
+								</volumes>
+								<!--wait for db to start-->
+								<wait>
+									<time>3000</time>
+								</wait>
+							</run>
+						</image>
+
+						<!-- pageviewservice -->
+						<image>
+							<alias>pageviewservice</alias>
+							<name>d4jd-pageviewservice</name>
+							<run>
+								<ports>
+									<port>8081:8081</port>
+								</ports>
+								<links>
+									<link>rabbitmqsrv:rabbitmqsrv</link>
+									<link>mysqldb:mysqldb</link>
+								</links>
+								<env>
+									<SPRING_DATASOURCE_URL>jdbc:mysql://mysqldb:3306/pageviewservice?enabledTLSProtocols=TLSv1.2</SPRING_DATASOURCE_URL>
+									<SPRING_PROFILES_ACTIVE>mysql</SPRING_PROFILES_ACTIVE>
+									<SPRING_RABBITMQ_HOST>rabbitmqsrv</SPRING_RABBITMQ_HOST>
+								</env>
+								<dependsOn>
+									<container>rabbitmqsrv</container>
+									<container>mysqldb</container>
+								</dependsOn>
+								<wait>
+									<!--
+									<http>
+										<url>http://localhost:8081/health</url>
+										<method>GET</method>
+										<status>200..399</status>
+									</http>
+                                    -->
+									<time>5000</time>
+								</wait>
+							</run>
+						</image>
+
 					</images>
 				</configuration>
 			</plugin>
