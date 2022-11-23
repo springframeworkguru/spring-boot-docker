@@ -23,9 +23,9 @@
 		<java.version>1.8</java.version>
 		<!--set this to your docker acct name-->
 		<docker.image.prefix>d4jd</docker.image.prefix>
-
 		<!--Set to name of project-->
 		<docker.image.name>springbootdocker</docker.image.name>
+		<docker.startParallel>true</docker.startParallel>
 	</properties>
 
 	<dependencies>
@@ -189,6 +189,26 @@
 
 					</images>
 				</configuration>
+
+				<executions>
+					<execution>
+						<id>start</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<!-- "build" should be used to create the images with the artifact -->
+							<goal>build</goal>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>stop</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
+
 			</plugin>
 
 			<plugin>
@@ -217,6 +237,21 @@
 						<scope>runtime</scope>
 					</dependency>
 				</dependencies>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.22.2</version>
+				<executions>
+					<execution>
+						<id>integration-test</id>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 		</plugins>
