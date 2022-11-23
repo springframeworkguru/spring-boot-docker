@@ -33,6 +33,11 @@ services:
       SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/pageviewservice?enabledTLSProtocols=TLSv1.2"
       SPRING_PROFILES_ACTIVE: mysql
       SPRING_RABBITMQ_HOST: rabbitmqsrv
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   springbootdocker:
     depends_on:
@@ -44,3 +49,8 @@ services:
     restart: always
     environment:
       SPRING_RABBITMQ_HOST: rabbitmqsrv
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

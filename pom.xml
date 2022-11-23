@@ -5,7 +5,7 @@
 
 	<groupId>guru.springframework</groupId>
 	<artifactId>spring-boot-docker</artifactId>
-	<version>0.0.9-SNAPSHOT</version>
+	<version>0.0.10-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>spring-boot-docker</name>
@@ -45,6 +45,10 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 
 		<!--testing deps-->
@@ -103,6 +107,17 @@
 									<container>rabbitmqsrv</container>
 									<container>pageviewservice</container>
 								</dependsOn>
+								<wait>
+									<!--
+									TODO: healthcheck seems to be executed too fast and fails
+									<http>
+										<url>http://localhost:8080/health</url>
+										<method>GET</method>
+										<status>200..399</status>
+									</http>
+									-->
+									<time>5000</time>
+								</wait>
 							</run>
 						</image>
 
@@ -176,12 +191,13 @@
 								</dependsOn>
 								<wait>
 									<!--
+									TODO: healthcheck seems to be executed too fast and fails
 									<http>
-										<url>http://localhost:8081/health</url>
+										<url>http://localhost:8081/actuator/health</url>
 										<method>GET</method>
 										<status>200..399</status>
 									</http>
-                                    -->
+									-->
 									<time>5000</time>
 								</wait>
 							</run>
