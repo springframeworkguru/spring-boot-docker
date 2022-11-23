@@ -1,0 +1,46 @@
+version: '2.4'
+
+services:
+  mysqldb:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    volumes:
+      - "/c/tmp/docker/mysql/pageviewservice:/var/lib/mysql"
+    restart: always
+    environment:
+      MYSQL_DATABASE: pageviewservice
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+      
+  rabbitmqsrv:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - "/c/tmp/docker/rabbitmq:/var/lib/rabbitmq"
+    restart: always
+
+  pageviewservice:
+    depends_on:
+      - rabbitmqsrv
+      - mysqldb
+    image: d4jd-pageviewservice
+    ports:
+      - "8081:8081"
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/pageviewservice?enabledTLSProtocols=TLSv1.2"
+      SPRING_PROFILES_ACTIVE: mysql
+      SPRING_RABBITMQ_HOST: rabbitmqsrv
+
+  springbootdocker:
+    depends_on:
+      - rabbitmqsrv
+      - pageviewservice
+    image: d4jd-springbootdocker
+    ports:
+      - "8080:8080"
+    restart: always
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmqsrv
