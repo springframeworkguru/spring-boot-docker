@@ -20,3 +20,80 @@ springframeworkguru/pageviewservice
 
 # Example MVN Command for CI
 mvn clean package verify docker:push
+
+#start docker compose in background
+docker-compose up -d
+
+#stop docker-compose
+docker-compose down
+
+## Create portainer service in docker swarm
+docker service create \
+--name portainer \
+--publish 9000:9000 \
+--constraint 'node.role == manager' \
+--mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
+portainer/portainer \
+-H unix:///var/run/docker.sock
+
+## force new quarum
+docker swarm init --force-new-cluster --advertise-addr node3:2377
+
+# MySQL Service
+docker service create \
+--name mysqldb -p 3306:3306 \
+-e MYSQL_DATABASE=pageviewservice \
+-e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
+mysql
+
+# List Processes in service
+docker service ps mysqldb
+
+#Rabbit MQ Service
+docker service create \
+ --name rabbitmq -p 5671:5671 -p 5672:5672 \
+ rabbitmq
+
+ # Pageview Service
+docker service create --name pageviewservice -p 8081:8081 \
+-e SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/pageviewservice \
+-e SPRING_PROFILES_ACTIVE=mysql  \
+-e SPRING_RABBITMQ_HOST=rabbitmq \
+springframeworkguru/pageviewservice
+
+# Spring Boot Web App
+docker service create --name springbootwebapp -p 8080:8080 \
+-e SPRING_RABBITMQ_HOST=rabbitmq \
+springframeworkguru/springbootdocker
+
+
+# With Overlay Network
+docker network create --driver overlay guru-service-network
+
+# MySQL Service
+docker service create \
+--name mysqldb -p 3306:3306 \
+-e MYSQL_DATABASE=pageviewservice \
+-e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
+--network guru-service-network \
+mysql
+
+#Rabbit MQ Service
+docker service create \
+ --name rabbitmq -p 5671:5671 -p 5672:5672 \
+ --network guru-service-network \
+ rabbitmq
+
+ # Pageview Service
+docker service create --name pageviewservice -p 8081:8081 \
+-e SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/pageviewservice \
+-e SPRING_PROFILES_ACTIVE=mysql  \
+-e SPRING_RABBITMQ_HOST=rabbitmq \
+--network guru-service-network \
+springframeworkguru/pageviewservice
+
+# Spring Boot Web App
+docker service create --name springbootwebapp -p 8080:8080 \
+-e SPRING_RABBITMQ_HOST=rabbitmq \
+--network guru-service-network \
+springframeworkguru/springbootdocker
