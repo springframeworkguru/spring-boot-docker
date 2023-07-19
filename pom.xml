@@ -5,7 +5,7 @@
 
 	<groupId>guru.springframework</groupId>
 	<artifactId>spring-boot-docker</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>spring-boot-docker</name>
@@ -21,6 +21,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
+		<docker.image.prefix>tetarrrr</docker.image.prefix>
+		<docker.image.name>springbootdocker</docker.image.name>
 	</properties>
 
 	<dependencies>
@@ -51,6 +53,62 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.20.0</version>
+
+				<configuration>
+					<dockerHost>npipe:////./pipe/docker_engine</dockerHost>
+					<verbose>true</verbose>
+					<images>
+						<image>
+							<name>${docker.image.prefix}/${docker.image.name}</name>
+							<build>
+								<dockerFileDir>${project.basedir}/target/dockerfile</dockerFileDir>
+								<assembly>
+									<descriptorRef>artifact</descriptorRef>
+								</assembly>
+								<tags>
+									<tag>latest</tag>
+									<tag>${project.version}</tag>
+								</tags>
+							</build>
+							<run>
+								<ports>
+									<port>8080:8080</port>
+								</ports>
+							</run>
+						</image>
+					</images>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.gmavenplus</groupId>
+				<artifactId>gmavenplus-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<scripts>
+						<script>file:///${project.basedir}/src/main/scripts/BuildDockerfile.groovy</script>
+					</scripts>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.codehaus.groovy</groupId>
+						<artifactId>groovy-all</artifactId>
+						<version>2.4.8</version>
+						<scope>runtime</scope>
+					</dependency>
+				</dependencies>
 			</plugin>
 		</plugins>
 	</build>
