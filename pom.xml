@@ -27,6 +27,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>guru.springframework</groupId>
+			<artifactId>page-view-client</artifactId>
+			<version>0.0.2</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
@@ -79,6 +84,72 @@
 								<ports>
 									<port>8080:8080</port>
 								</ports>
+								<links>
+									<link>rabbitmq:rabbitmq</link>
+								</links>
+								<env>
+									<SPRING_RABBITMQ_HOST>rabbitmq</SPRING_RABBITMQ_HOST>
+								</env>
+								<dependsOn>
+									<container>rabbitmq</container>
+									<container>pageviewservice</container>
+								</dependsOn>
+							</run>
+						</image>
+						<image>
+							<name>mysql:5.7</name>
+							<alias>mysqldb</alias>
+							<run>
+								<ports>
+									<port>3306:3306</port>
+								</ports>
+								<env>
+									<MYSQL_DATABASE>pageviewservice</MYSQL_DATABASE>
+									<MYSQL_ALLOW_EMPTY_PASSWORD>yes</MYSQL_ALLOW_EMPTY_PASSWORD>
+								</env>
+								<wait>
+									<time>10000</time>
+								</wait>
+							</run>
+						</image>
+						<image>
+							<name>rabbitmq:3-management</name>
+							<alias>rabbitmq</alias>
+							<run>
+								<ports>
+									<port>5671</port>
+									<port>5672</port>
+									<port>4369</port>
+									<port>23672</port>
+								</ports>
+								<wait>
+									<time>10000</time>
+								</wait>
+							</run>
+						</image>
+						<image>
+							<name>springframeworkguru/pageviewservice</name>
+							<alias>pageviewservice</alias>
+							<run>
+								<ports>
+									<port>8081:8081</port>
+								</ports>
+								<links>
+									<link>rabbitmq:rabbitmq</link>
+									<link>mysqldb:mysqldb</link>
+								</links>
+								<env>
+									<SPRING_DATASOURCE_URL>jdbc:mysql://mysqldb:3306/pageviewservice?useSSL=false</SPRING_DATASOURCE_URL>
+									<SPRING_PROFILE_ACTIVE>mysql</SPRING_PROFILE_ACTIVE>
+									<SPRING_RABBITMQ_HOST>rabbitmq</SPRING_RABBITMQ_HOST>
+								</env>
+								<dependsOn>
+									<container>rabbitmq</container>
+									<container>mysqldb</container>
+								</dependsOn>
+								<wait>
+									<time>10000</time>
+								</wait>
 							</run>
 						</image>
 					</images>
